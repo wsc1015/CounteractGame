@@ -15,6 +15,7 @@ import android.view.SurfaceView;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Random;
@@ -25,15 +26,26 @@ import java.util.Random;
 public class GameView extends SurfaceView implements View.OnTouchListener{
     private static int WIDTH = 30;
     private static int OFFSETY = 30;
-    private static final int COLS = 6;
-    private static final int ROWS = 6;
+    private static final int COLS = 2;
+    private static final int ROWS = 2;
+
+    private static final int CLASSIC_MODE = 1;
+    private static final int ZEN_MODE = 2;
+
     private Slot[][] matrix;
     private ArrayList<Integer> content;
     private LinkedList<Slot> uncoveredSlot;
+
     private Thread timeCount;
+    private boolean timeCountFlag;
+    private boolean justStartFlag;
+    private int mode;
+    public String showTime;
+
 
     public GameView(Context context) {
         super(context);
+        mode = CLASSIC_MODE;
         getHolder().addCallback(callback);
         setOnTouchListener(this);
         initGame();
@@ -41,6 +53,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener{
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mode = CLASSIC_MODE;
         getHolder().addCallback(callback);
         setOnTouchListener(this);
         initGame();
@@ -48,6 +61,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener{
 
     public GameView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        mode = CLASSIC_MODE;
         getHolder().addCallback(callback);
         setOnTouchListener(this);
         initGame();
@@ -69,6 +83,9 @@ public class GameView extends SurfaceView implements View.OnTouchListener{
                 matrix[i][j] = new Slot(content.get(i * COLS + j));
             }
         }
+        timeCountFlag = true;
+        justStartFlag = true;
+        setUpTimeCounter();
     }
 
     public void redraw(){
@@ -131,6 +148,10 @@ public class GameView extends SurfaceView implements View.OnTouchListener{
                 x = (int) ((event.getX() - WIDTH) / WIDTH);
             }
             if(x >= 0 && x < COLS && y >= 0 && y < ROWS){
+                if(justStartFlag && timeCountFlag){
+                    justStartFlag = false;
+                    timeCount.start();
+                }
                 if(matrix[y][x].getStatus() == Slot.COVERED){
                     matrix[y][x].setStatus(Slot.UNCOVERED);
                     uncoveredSlot.offer(matrix[y][x]);
@@ -140,6 +161,23 @@ public class GameView extends SurfaceView implements View.OnTouchListener{
             }
         }
         return true;
+    }
+
+    private void setUpTimeCounter(){
+        timeCount = new Thread(new Runnable(){
+            @Override
+            public void run() {
+                if(mode == CLASSIC_MODE){
+                    showTime = "0.00";
+                    long startTime = Calendar.getInstance().getTimeInMillis();
+                    long currentTime;
+                    while(timeCountFlag){
+                        currentTime = Calendar.getInstance().getTimeInMillis();
+                        showTime = "" + (currentTime - startTime) / 1000.00;
+                    }
+                }
+            }
+        });
     }
 
     private boolean change(){
@@ -162,8 +200,9 @@ public class GameView extends SurfaceView implements View.OnTouchListener{
         }
 
         if(checkWin()){
+
             waitShow();
-            new AlertDialog.Builder(getContext()).setTitle("Congratulations !!").setMessage("You Win !!").setPositiveButton("New Game", new DialogInterface.OnClickListener() {
+            new AlertDialog.Builder(getContext()).setTitle("Congratulations !!").setMessage("You Win !!" + "\n" + "You cost " + showTime + " S").setCancelable(false).setPositiveButton("New Game", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     initGame();
@@ -194,6 +233,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener{
             }
         }
         if(j == COLS && i == ROWS){
+            timeCountFlag = false;
             return true;
         }
         return false;
