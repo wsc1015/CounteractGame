@@ -26,9 +26,6 @@ public class Slot{
         return mark;
     }
 
-    public void setMark(int mark) {
-        this.mark = mark;
-    }
 
     public int getStatus() {
         return status;
