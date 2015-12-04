@@ -30,9 +30,10 @@ import java.util.TimerTask;
 public class GameView extends SurfaceView implements View.OnTouchListener{
     private static int WIDTH = 60;
     private static int OFFSETY = 200;
-    private static final int COLS = 2;
-    private static final int ROWS = 2;
+    private static final int COLS = 6;
+    private static final int ROWS = 4;
 
+    private boolean gameStartFlag;
     private Slot[][] matrix;
     private ArrayList<Integer> content;
     private LinkedList<Slot> uncoveredSlot;
@@ -62,6 +63,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener{
     }
 
     public void initGame(){
+        gameStartFlag = false;
         matrix = new Slot[ROWS][COLS];
         uncoveredSlot = new LinkedList<Slot>();
         Random random = new Random();
@@ -140,6 +142,10 @@ public class GameView extends SurfaceView implements View.OnTouchListener{
                 x = (int) ((event.getX() - WIDTH) / WIDTH);
             }
             if(x >= 0 && x < COLS && y >= 0 && y < ROWS){
+                if(!gameStartFlag){
+                    gameStartFlag = true;
+                    MainPage.getMainPage().startGame();
+                }
                 if(matrix[y][x].getStatus() == Slot.COVERED){
                     matrix[y][x].setStatus(Slot.UNCOVERED);
                     uncoveredSlot.offer(matrix[y][x]);
@@ -179,6 +185,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener{
                 public void onClick(DialogInterface dialog, int which) {
                     initGame();
                     redraw();
+                    MainPage.getMainPage().initGame();
                 }
             }).show();
         }
@@ -205,6 +212,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener{
             }
         }
         if(j == COLS && i == ROWS){
+            MainPage.getMainPage().endGame();
             return true;
         }
         return false;

@@ -9,18 +9,21 @@
     tools:context="kevinproject.counteractgame.MainPage"
     tools:showIn="@layout/activity_main_page">
 
+
+
+    <TextView
+        android:id="@+id/showTimeTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/timeColor"
+        android:text="empty"
+        android:background="@color/white"
+        android:textAlignment="center"
+        android:textSize="40dp"/>
+
     <kevinproject.counteractgame.GameView
         android:id="@+id/gameView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
-    <TextView
-        
-        android:id="@+id/showTimeTV"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorPrimaryDark"
-        android:text="empty"
-        android:textSize="40dp"/>
 
 </LinearLayout>
