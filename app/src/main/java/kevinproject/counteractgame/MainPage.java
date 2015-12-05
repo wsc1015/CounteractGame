@@ -30,14 +30,18 @@ public class MainPage extends AppCompatActivity {
     private String showTime;
     private android.os.Handler handler;
 
-    private static final int CLASSIC_MODE = 1;
-    private static final int ZEN_MODE = 2;
+    public static final int CLASSIC_MODE = 1;
+    public static final int ZEN_MODE = 2;
 
     private static final int MSG_REFRESH_TIME = 1;
 
     private TextView showTimeTV;
 
     private static MainPage mainPage;
+
+    public int getMode() {
+        return mode;
+    }
 
     public MainPage() {
         this.mainPage = this;
@@ -87,25 +91,26 @@ public class MainPage extends AppCompatActivity {
                 handler.sendEmptyMessage(MSG_REFRESH_TIME);
             }
         };
-        switch (mode) {
-            case CLASSIC_MODE:
-                timeCount = new TimerTask() {
-                    @Override
-                    public void run() {
+        timeCount = new TimerTask() {
+            @Override
+            public void run() {
+                switch (mode){
+                    case CLASSIC_MODE:
                         tenMSecs++;
-                    }
-                };
-                break;
-            case ZEN_MODE:
-                break;
-            default:
-                break;
-        }
+                        break;
+                    case ZEN_MODE:
+                        tenMSecs--;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
         resetTenMSec();
         updateShowTime();
         showTimeTV.setText(showTime);
         timeManager.schedule(timeCount, 10, 10);
-        timeManager.schedule(showTimeTask, 210, 210);
+        timeManager.schedule(showTimeTask, 110, 110);
     }
 
     public void endGame(){
@@ -118,6 +123,7 @@ public class MainPage extends AppCompatActivity {
     public void resetTenMSec(){
         switch (mode){
             case ZEN_MODE:
+                tenMSecs = 6000;
                 break;
             case CLASSIC_MODE:
                 tenMSecs = 0;

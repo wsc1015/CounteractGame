@@ -202,18 +202,26 @@ public class GameView extends SurfaceView implements View.OnTouchListener{
     }
 
     private boolean checkWin(){
-        int i, j = 0;
-        Loop:
-        for(i = 0; i < ROWS; i++){
-            for(j = 0; j < COLS; j++){
-                if(matrix[i][j].getStatus() != Slot.COUNTERACTED){
-                    break Loop;
+        switch (MainPage.getMainPage().getMode()) {
+            case MainPage.CLASSIC_MODE:
+                int i, j = 0;
+                Loop:
+                for (i = 0; i < ROWS; i++) {
+                    for (j = 0; j < COLS; j++) {
+                        if (matrix[i][j].getStatus() != Slot.COUNTERACTED) {
+                            break Loop;
+                        }
+                    }
                 }
-            }
-        }
-        if(j == COLS && i == ROWS){
-            MainPage.getMainPage().endGame();
-            return true;
+                if (j == COLS && i == ROWS) {
+                    MainPage.getMainPage().endGame();
+                    return true;
+                }
+                return false;
+            case MainPage.ZEN_MODE:
+                break;
+            default:
+                break;
         }
         return false;
     }
